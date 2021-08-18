@@ -28,42 +28,153 @@
         </style>
 	</head>
 	<body>
-		<h1>Mark's Final Project Game Name</h1>
-        <div class="row">
+        <div id="startScreen">
+            <button type="button" id="startBtn">Start Game!</button>
+            <img src="dungeon.jpeg">
+        </div>
+	    <div class="row" id="gameContents">
             <div class="storyColumn">
-            <p>Time: <span id='timer'>00:00:00</span></p>
-            <p>Your Objective: Make it out of the Dungeon alive</p>
-            <p><span id='storyContainer'></span></p>
-            <table style="width:100%">
-                <tr>
-                    <td id = "Choice1" style="display: block">Test</td>
-                    <td id = "Choice2" style="display: block">Test</td>
-                    <td id = "Choice3" style="display: block">Test</td>
-                    <td id = "Choice4" style="display: block">Test</td>
-                    <td id = "Choice5" style="display: block">Test</td>
-                </tr>
-            </table>
-        </div>
-        <div class="statsColumn">
-            <div class="canvasContainer">
-                <p><strong>Player Status</strong></p>
-                <canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+                <h1>Mark's Final Project The Dungeon</h1>
+                <p>Time: <span id='timer'>00:00:00</span></p>
+                <p>Your Objective: Make it out of the Dungeon alive</p>
+                <p>Game Controls: Press (1-5) to select an option. Press 'i' to view your inventory.</p>
+                <p><span id='storyContainer'></span></p>
+                <table style="width:100%">
+                    <tr>
+                        <td id = "Choice1" style="display: block">Test</td>
+                        <td id = "Choice2" style="display: block">Test</td>
+                        <td id = "Choice3" style="display: block">Test</td>
+                        <td id = "Choice4" style="display: block">Test</td>
+                        <td id = "Choice5" style="display: block">Test</td>
+                    </tr>
+                </table>
             </div>
-        </div>
-    </div>
+		<div class="statsColumn">
+		    <div class="canvasContainer">
+			<p><strong>Player Status</strong></p>
+			<p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
+			<p>Armour Condition: <span id=armourDurability></span></p>
+			<p>Weapon Condition: <span id=weaponDurability></span></p>
+			<canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+		    </div>
+		</div>
+	    </div>
 		<script>
             var playerObj, weakarmorObj, weakswordObj;//, loafObj, potatoObj;
 
             const GAME_EVENTS = new Array();
             const MUSHROOM_INDEX = 0;
-            const ARMOR_INDEX = 1;
+            const ARMOUR_INDEX = 1;
             const WEAPON_INDEX = 2;
             const MAX_CHOICES = 5;
             var currentEvent;
+            var width, height = 300;
 
+            var playerCanvas = document.getElementById("canvas");
+            playerCanvas.style.backgroundColor = "white";
+            var context = canvas.getContext("2d");
+
+            var gameContents = document.getElementById("gameContents");
+            gameContents.style.display = "none";
+            var startScreen = document.getElementById("startScreen");
+
+            document.getElementById("startBtn").addEventListener("click", function() {
+                startScreen.style.display = "none";
+                gameContents.style.display = "block";
+            });
+
+	        var healthStatus = document.getElementById("playerHealth");
+            var sanityStatus = document.getElementById("playerSanity");
+            var armourStatus = document.getElementById("armourDurability");
+            var weaponStatus = document.getElementById("weaponDurability");
 
             function randomNumber(min, max){                               
                 return Math.floor(Math.random() * (max - min + 1)) + min;  
+            }
+
+            function updatePlayerStatus(status, amount){
+                context.clearRect(0, 0, width, height);
+                // Draw the eyes
+                context.beginPath();
+                context.arc(120, 100, 20, 0, 2 * Math.PI);
+                context.stroke()
+                context.beginPath();
+                context.arc(180, 100, 20, 0, 2 * Math.PI);
+                context.stroke()
+                switch(status){
+                    case "happy":
+                        context.beginPath();
+                        context.arc(150, 160, 90, 0, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        break;
+                    case "alright":
+                        context.beginPath();
+                        context.moveTo(80, 200);
+                        context.lineTo(220, 200)
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        break;
+                    case "sad":
+                        context.beginPath();
+                        context.arc(150, 250, 80, 0 * Math.PI, 1 * Math.PI, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.moveTo(180, 120);
+                        context.lineTo(190, 140)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(180, 120);
+                        context.lineTo(170, 140)
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(180, 140, 10, 0, 1 * Math.PI);
+                        context.stroke()
+                        break;
+                    case "dead":
+                        context.beginPath();
+                        context.arc(150, 250, 80, 0 * Math.PI, 1 * Math.PI, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(160, 120);
+                        context.lineTo(200, 80)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(160, 80);
+                        context.lineTo(200, 120)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(100, 120);
+                        context.lineTo(140, 80)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(100, 80);
+                        context.lineTo(140, 120)
+                        context.stroke()
+                        break;
+                    case "setH":
+                        healthStatus.innerText = amount;
+                        break;
+                    case "setG":
+                        goldStatus.innerText = amount;
+                        break;
+                }
             }
 
             function keyListener(){
@@ -118,8 +229,16 @@
                             }
                         }
                         break;
-                    case "p":
-                        playerObj.inventory[MUSHROOM_INDEX].drinkMushroom();
+                    case "e":
+                        playerObj.inventory[MUSHROOM_INDEX].eatMushroom();
+                        break;
+                    case "i":
+                        var stringToAlert = "You have "
+                        var mushrooms = playerObj.inventory[MUSHROOM_INDEX];
+                        stringToAlert += mushrooms.quantity + " strange mushrooms, ";
+                        stringToAlert += playerObj.inventory[ARMOUR_INDEX].name + " and a ";
+                        stringToAlert += playerObj.inventory[WEAPON_INDEX].name; 
+                        alert(stringToAlert);
                         break;
                 }
             }
@@ -127,10 +246,15 @@
             window.addEventListener("keypress", keyListener);
 
             function setupPlayer() {
-                var mushroomsObj = {"quantity": 0, "drinkMushroom" : function(){ eatMushroom(this)}};
-                weakarmorObj = {"name" : "light armor", "durability" : 25};
+                var mushroomsObj = {"quantity": 0, "eatMushroom" : function(){ eatMushroom(this)}};
+                weakarmourObj = {"name" : "light armour", "durability" : 25};
                 weakswordObj = {"name" : "wooden sword", "durability" : 10};
-                playerObj = { "health" : 150, "sanity": 50, "inventory" : [mushroomsObj, weakarmorObj, weakswordObj]};
+                playerObj = { "health" : 150, "sanity": 50, "inventory" : [mushroomsObj, weakarmourObj, weakswordObj]};
+                healthStatus.innerText = playerObj.health;
+                sanityStatus.innerText = playerObj.sanity;
+                armourStatus.innerText = playerObj.inventory[ARMOUR_INDEX].durability;
+                weaponStatus.innerText = playerObj.inventory[WEAPON_INDEX].durability;
+                updatePlayerStatus("happy");
                 // loafObj = {"name" : "loaf of bread", "quantity" : 1};
                 // potatoObj = {"name" : "bag of potatoes", "quantity" : 1};
                 // playerInventory
@@ -144,6 +268,7 @@
             function eatMushroom(mushroom) {
                 if (mushroom.quantity>0){
                     playerObj.health +=randomNumber(-5,25);
+                    updatePlayerStatus("setH", playerObj.health);
                     mushroom.quantity--;
                     console.log(playerObj);
                 }
@@ -164,9 +289,9 @@
                             alert("You cannot afford to buy another Mushroom");
                         }
                         break;
-                    case "Armor":
+                    case "Armour":
                         if(playerObj.gold >= 300){
-                            playerObj.inventory[ARMOR_INDEX] = "has fake gold";
+                            playerObj.inventory[ARMOUR_INDEX] = "has fake gold";
                             playerObj.gold -= 300;
                             console.log(playerObj);
                         } else {
@@ -190,22 +315,56 @@
                 var winGame = {"text": "You made it out", "choices" : []};
                 var loseGame = {"text": "You died", "choices" : []};
                 var addMushroomToInventory = {"add": function() {addItemToInventory("Mushroom")}};
-                var addArmorToInventory = {"add": function() {addItemToInventory("Armor")}};
+                var addArmourToInventory = {"add": function() {addItemToInventory("Armour")}};
                 var addWeaponToInventory = {"add": function() {addItemToInventory("Weapon")}};
                 // TODO: Add obj vars with text, choices and outcomes. For outcomes that require a function we will need to make functions of them like I have above for adding the items to the inventory. Add events in reverse order as the event that happens before needs to know about the event happening after it, which must first be defined and created.
 
                 // TODO: change startHome event text, choices and outcomes
                 var lose = {"text" : "You trip into spikes and die", "choices": [], "outcomes": [loseGame]};
-                var pass = {"text" : "You trip then hit your head", "choices": ["wake"], "outcomes": [exitRoom]};
+                var doorOne = {"text" : "You open the door, and made it out", "choices": [], "outcomes": [winGame]};
+                var doorTwo = {"text" : "You open the door, and fall into an abyss", "choices": [], "outcomes": [loseGame]};
+                var doors = {"text" : "You find two doors, choose wisely ", "choices": ["black door", "red door"], "outcomes": [doorOne, doorTwo]};
+                var stairs = {"text" : "You walk up the stairs", "choices": ["doors"], "outcomes": [doors]};
+                var exitRoom = {"text" : "You wake up and exit the room", "choices": ["stairs"], "outcomes": [stairs]};
+                var pass = {"text" : "You trip then hit your head", "choices": ["wake up"], "outcomes": [exitRoom]};
                 var trip = {"text" : "You trip then...", "choices": ["lose", "pass"], "outcomes": [lose, pass]};
-                var kill = {"text" : "You kill the goblin", "choices": ["find"], "outcomes": [winGame]};
+                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
+                var hall = {"text" : "You walk down the hall", "choices": ["door"], "outcomes": [door]};
+                var search = {"text" : "You start to search and a spike trap is set off and you die", "choices": [], "outcomes": [loseGame]};
+                var stairs = {"text" : "You walk up the stairs", "choices": ["search"], "outcomes": [search]};
+                var find = {"text" : "You find a hall and stairs", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
+                var kill = {"text" : "You kill the goblin", "choices": ["find"], "outcomes": [find]};
                 var chase = {"text" : "You chase the goblin", "choices": ["trip", "kill"], "outcomes": [trip, kill]};
                 var useSword = {"text" : "You hurt the goblin and he runs away", "choices": ["chase"], "outcomes": [chase]};
+                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
+                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
+                var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
+                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
+                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
+                var exitRoom = {"text" : "While running you exit the room", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
                 var run = {"text" : "You manage to run away from the goblin", "choices": ["Exit room"], "outcomes": [exitRoom]};
                 var screamHelp = {"text" : "A goblin comes from around the corner", "choices": ["use sword", "run"], "outcomes": [useSword, run]};
                 //Search room
-                var searchAgain = {"text" : "You find nothing again", "choices": ["lose 2 sanity"], "outcomes": [winGame]};
-                var exitRoom = {"text" : "You exit the room and enter a new one", "choices": ["search"], "outcomes": [winGame]};
+                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
+                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
+                var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
+                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
+                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
+                var exitRoom = {"text" : "While running you exit the room", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
+                var searchAgain = {"text" : "You find nothing again", "choices": ["exit room"], "outcomes": [exitRoom]};
+                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
+                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
+                var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
+                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
+                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
+                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
+                var exitRoom = {"text" : "You find hall and stairs, choose wisely", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
+                var exitRoom = {"text" : "You exit the room and enter a new one", "choices": ["exit room"], "outcomes": [exitRoom]};
                 var searchRoom = {"text" : "You search the room and find nothing", "choices": ["Search again", "exit room"], "outcomes": [searchAgain, exitRoom]};
                 // [addMushroomToInventory, addArmorToInventory, addWeaponToInventory, screamHelp] };
                 var gameEvent1 = {"text" : "You wake up in a cold dungeon, but you have no idea how you got there.", "choices": ["Search Room", "Scream for help"], "outcomes": [searchRoom, screamHelp]};
@@ -277,9 +436,7 @@
             
             11. The game must include at least one sort of non-time based counter that is displayed to the player. That could be money, health, score, magic, stress level, or any numerical system related to the game. There can be multiples of these but they must be represented to the player in some way(in number, in bars, in symbols, ect...). These values should be stored in their own variables or property of a larger game object.
             
-            12. The game must implement some drawing in a <canvas> tag. Some suggestions are a map of the world showing the players current position, drawing enemies or battle effects when a choice is made. Can even use multiples to draw the interface out creating custom buttons. The canvas must however either react to the game(updating a players position) or to the player actions(a hover effect if used for a button)
-            
-            13. The game will need to have at least 40 different "scenes" with at least 15 of those having choices/actions to be made. The scenes must convey using text what is happening. Images can also be used, or feel free to draw out a scene using the <canvas> tag. If you are using some sort of battle system in the game, then a single battle is one set of choices/actions in a single scene, not each time you choose an action in the battle. These choices/actions must branch off into different results and have some effect on the game. (both choices always lead to the exact same following result) There can be more than two choices per scene and after the results have had their effect, the game can come back to single path or the can infinitely branch out with many possible endings.
+            13. The game will need to have at least 40 different "scenes" with at least 15 of those having choices/actions to be made. The scenes must convey using text what is happening. Images can also be used. If you are using some sort of battle system in the game, then a single battle is one set of choices/actions in a single scene, not each time you choose an action in the battle. These choices/actions must branch off into different results and have some effect on the game. (both choices always lead to the exact same following result) There can be more than two choices per scene and after the results have had their effect, the game can come back to single path or the can infinitely branch out with many possible endings.
             Each action a player can make is both represented visually on the screen (button, something clickable) or with the use of the keyboard. The corresponding key to press can be displayed as a hover effect over the button, or described outside the game in the HTML, or inside the game in an instructions screen, or on the button itself.
             
             14. The game must make use of random numbers in a meaningful way. This can be randomly selected choice, a random event or chance at an event happening, random damage in a battle, or random item pickups.
@@ -287,7 +444,7 @@
             15. The game will need some sort of start and ending screen.
             16. The code should be heavily commented describing what the code is doing or supposed to do.
             17. Be sure to test and debug the game before submitting. Obvious bugs, non-functioning code and fatal errors will be reflected in the grade.
-            18. Be school appropriate with the language and context. This is a video game project and there is violence in video games. However there is no need to go overboard with gratuity of the content.*/
+            */
 
         </script>
     </body>
