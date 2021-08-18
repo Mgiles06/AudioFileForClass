@@ -73,6 +73,7 @@
             var width, height = 300;
             var statusId;
             var timerId;
+            var count = 0;
 
             var playerCanvas = document.getElementById("canvas");
             playerCanvas.style.backgroundColor = "white";
@@ -89,6 +90,7 @@
             document.getElementById("startBtn").addEventListener("click", function() {
                 startScreen.style.display = "none";
                 gameContents.style.display = "block";
+                timerId = setInterval(updateTimer,1000);
             });
 
 	        var healthStatus = document.getElementById("playerHealth");
@@ -101,11 +103,8 @@
             }
 
             function updateTimer(){
-				var counter
-                counter++;
                 var SECONDS = 60;
                 var MINUTES = 60;
-                count = 0;
                 count++;
 				var hours, minutes, seconds;
 				displayString = "";
@@ -485,32 +484,11 @@
                 var startEvent = GAME_EVENTS[0];
                 updateChoices(startEvent);
                 currentEvent = startEvent;
-                timerId = setInterval(updateTimer,1000);
-                // Game will run while player has health and has not reached home
-                // while(playerObj.health > 0 && !currentEvent.text.includes("You made it home")){
-                //     // var startEvent = GAME_EVENTS[0];
-                //     var storyText = document.getElementById("storyContainer");
-                    
-                //     console.log("Looping");
-                //     playerObj.health -= 10;
-                // }
-                
             }
 
 
             setupPlayer();
             main();
-
-            /*
-            
-            10. The game will need to make use of a timer of some sorts that uses setInterval. This could be a game timer, or a timed scenario, or a battle timer, or any mixture of these. It can count up or countdown. This timer must be displayed to the user in an appropriate way. (no need to show hours if it countdowns in second)
-            
-            14. Implement some kind of "cheat code" in the game. It can skip to the end of the game, give alot of resources (money/health), reset a timer ect... The code must be entered on the keyboard using a specific combination of key presses that are not accidentaly going to get pressed (6+ keys in the sequence). The keys must be pressed within 1 second of each other and must be consecutive. If too much time elapses or an incorrect key is pressed in the middle of the sequence, the whole sequence should reset.
-
-            15. The game will need some sort of start and ending screen.
-            16. The code should be heavily commented describing what the code is doing or supposed to do.
-            17. Be sure to test and debug the game before submitting. Obvious bugs, non-functioning code and fatal errors will be reflected in the grade.
-            */
 
         </script>
     </body>
