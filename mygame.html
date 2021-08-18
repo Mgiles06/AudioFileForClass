@@ -297,69 +297,100 @@
                 var addMushroomToInventory = {"add": function() {addItemToInventory("Mushroom")}};
                 var addArmourToInventory = {"add": function() {addItemToInventory("Armour")}};
                 var addWeaponToInventory = {"add": function() {addItemToInventory("Weapon")}};
-                // TODO: Add obj vars with text, choices and outcomes. For outcomes that require a function we will need to make functions of them like I have above for adding the items to the inventory. Add events in reverse order as the event that happens before needs to know about the event happening after it, which must first be defined and created.
-
-                // TODO: change startHome event text, choices and outcomes
-                var lose = {"text" : "You trip into spikes and die", "choices": [], "outcomes": [loseGame]};
-                var doorOne = {"text" : "You open the door, and made it out", "choices": [], "outcomes": [winGame]};
-                var doorTwo = {"text" : "You open the door, and fall into an abyss", "choices": [], "outcomes": [loseGame]};
-                var doors = {"text" : "You find two doors, choose wisely ", "choices": ["black door", "red door"], "outcomes": [doorOne, doorTwo]};
-                var stairs = {"text" : "You walk up the stairs", "choices": ["doors"], "outcomes": [doors]};
-                var exitRoom = {"text" : "You wake up and exit the room", "choices": ["stairs"], "outcomes": [stairs]};
-                var pass = {"text" : "You trip then hit your head", "choices": ["wake up"], "outcomes": [exitRoom]};
-                var trip = {"text" : "You trip then...", "choices": ["lose", "pass"], "outcomes": [lose, pass]};
-                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
-                var hall = {"text" : "You walk down the hall", "choices": ["door"], "outcomes": [door]};
-                var search = {"text" : "You start to search and a spike trap is set off and you die", "choices": [], "outcomes": [loseGame]};
-                var stairs = {"text" : "You walk up the stairs", "choices": ["search"], "outcomes": [search]};
-                var find = {"text" : "You find a hall and stairs", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
-                var kill = {"text" : "You kill the goblin", "choices": ["find"], "outcomes": [find]};
-                var chase = {"text" : "You chase the goblin", "choices": ["trip", "kill"], "outcomes": [trip, kill]};
-                var useSword = {"text" : "You hurt the goblin and he runs away", "choices": ["chase"], "outcomes": [chase]};
-                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
-                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
+                var keepChasing = {"text" : "You jump but don't make it across the chasm and fall into spikes at the bottom of a pit dying instantly", "choices": ["Continue"], "outcomes": [loseGame]};
+                var blackDoor = {"text" : "You open the door, and made it out", "choices": ["Continue"], "outcomes": [winGame]};
+                var redDoor = {"text" : "You open the door, and fall into an abyss plumeting to your death",
+                "gameEvent": function() {
+                    playerObj.health = 0;
+                    updatePlayerStatus("setH", playerObj.health);
+                }, "choices": ["Continue"], "outcomes": [loseGame]};
+                var doors = {"text" : "You have no way of knowing what is behind either of the doors, all you can do is choose wisely ", "choices": ["Open the black door", "Open the red door"], "outcomes": [blackDoor, redDoor]};
+                var stairs3 = {"text" : "You walk up the stairs and at the top of the stairs you see two doors in front of you", "choices": ["Continue"], "outcomes": [doors]};
+                var exitRoom3 = {"text" : "You wake up and see some stairs just outside the room", "choices": ["Go up the stairs"], "outcomes": [stairs3]};
+                var pass = {"text" : "You notice a huge welt on your head just before passing out",
+                "gameEvent": function() {
+                    playerObj.sanity -= 10;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                }, "choices": ["Continue"], "outcomes": [exitRoom3]};
+                var sprintAfter = {"text" : "While sprinting after the goblin you trip then...",
+                "gameEvent": function() {
+                    playerObj.health -= 25;
+                    updatePlayerStatus("setH", playerObj.health);
+                }, "choices": ["Get back up and jump after the goblin", "Take a moment to look over your wounds"], "outcomes": [keepChasing, pass]};
+                var door2 = {"text" : "You open the door, but break your sword in the process. Luckily you have found a way out!",
+                "gameEvent": function() {
+                    playerObj.inventory[WEAPON_INDEX].durability = 0;
+                    updatePlayerStatus("setWeapon", playerObj.inventory[WEAPON_INDEX].durability);
+                }, "choices": ["Continue"], "outcomes": [winGame]};
+                var hall2 = {"text" : "You walk down the hall and find a door that seems to be jammed shut", "choices": ["Use your sword to try and open it"], "outcomes": [door2]};
+                var search = {"text" : "You reach out to grab the shiny object and a spike trap is set off instantly killing you",
+                "gameEvent": function() {
+                    playerObj.health = 0;
+                    updatePlayerStatus("setH", playerObj.health);
+                }, "choices": ["Continue"], "outcomes": [loseGame]};
+                var stairs2 = {"text" : "You begin walking up the stairs and see something shiny hanging over a ledge to your right", "choices": ["Investigate the shiny object"], "outcomes": [search]};
+                //After killing the goblin
+                var find = {"text" : "You find a dimly lit hall and stairs which seem to lead to a way out", "choices": ["Venture down the hall", "Try going up the stairs"], "outcomes": [hall2, stairs2]};
+                
+                var roomOne = {"text" : "You walk into the room, and get scared to death",
+                "gameEvent": function() {
+                    playerObj.sanity = 0;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                }, "choices": ["Continue"], "outcomes": [loseGame]};
+                var door = {"text" : "You open the door, and make it out of the dungeon and have escaped!", "choices": ["Continue"], "outcomes": [winGame]};
+                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["open the yellow door"], "outcomes": [door]};
                 var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
-                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
-                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
-                var exitRoom = {"text" : "While running you exit the room", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
-                var run = {"text" : "You manage to run away from the goblin", "choices": ["Exit room"], "outcomes": [exitRoom]};
-                var screamHelp = {"text" : "A goblin comes from around the corner", "choices": ["use sword", "run"], "outcomes": [useSword, run]};
-                //Search room
-                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
-                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
-                var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
-                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
-                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
-                var exitRoom = {"text" : "While running you exit the room", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
+                var doorTwo = {"text" : "You walk into the room, and get scared to death",
+                "gameEvent": function() {
+                    playerObj.sanity = 0;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                }, "choices": ["Continue"], "outcomes": [loseGame]};
+                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["Open the brown door", "Open the green door"], "outcomes": [doorOne, doorTwo]};
+                var hall = {"text" : "You start your way down the hall and notice two rooms on either side.", "choices": ["Enter through the cobwebs to the room on the left", "Enter the cold room on your right"], "outcomes": [roomOne, roomTwo]};
+                // Hall has few paths some are good others bad, stairs leads up to the door
+                var exitRoom2 = {"text" : "You find a hall and stairs, choose wisely", "choices": ["go down the hall", "go up the stairs"], "outcomes": [hall, stairs]};
+                // Continue to room 2
+                var exitRoom1 = {"text" : "You exit the room and enter a new one", "choices": ["Continue on to the next room"], "outcomes": [exitRoom2]};
+                //Screaming option
+                var run = {"text" : "You manage to run away from the goblin", "choices": ["Exit room"], "outcomes": [exitRoom1]};
+                var kill = {"text" : "Using your torch you avoid the obstacles in the dungeon and finally kill the goblin",
+                "gameEvent": function() {
+                    playerObj.sanity = 10;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                }, "choices": ["Continue walking through the dungeon"], "outcomes": [find]};
+                var chase = {"text" : "You chase the goblin through the darkness", "choices": ["Sprint after him!", "Grab a torch to light your way"], "outcomes": [sprintAfter, kill]};
+                var useSword = {"text" : "You hurt the goblin and he runs away", 
+                "gameEvent": function() {
+                    playerObj.inventory[WEAPON_INDEX].durability -= 2;
+                    updatePlayerStatus("setWeapon", playerObj.inventory[WEAPON_INDEX].durability);
+                }, "choices": ["chase"], "outcomes": [chase]};
+                var screamHelp = {"text" : "A goblin comes from around the corner and hits you", 
+                "gameEvent": function() {
+                    if (playerObj.inventory[ARMOUR_INDEX].durability > 0){
+                        playerObj.inventory[ARMOUR_INDEX].durability -= 10;
+                        updatePlayerStatus("setArmour", playerObj.inventory[ARMOUR_INDEX].durability);
+                    } else {
+                        playerObj.health -= 10;
+                        updatePlayerStatus("setH", playerObj.health);
+                    }
+                }, "choices": ["use sword", "run"], "outcomes": [useSword, run]};
+                //Search again but after this have to exit the room.
                 var searchAgain = {"text" : "You find nothing again and are really starting to go insane!", 
                 "gameEvent": function() {
                     playerObj.sanity -= 10;
                     updatePlayerStatus("setS", playerObj.sanity);
                 },
-                "choices": ["exit room"], "outcomes": [exitRoom]};
-                var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
-                var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
-                var doorOne = {"text" : "You open the door to find stairs", "choices": ["stairs"], "outcomes": [stairs]};
-                var doorTwo = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
-                var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
-                var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
-                var exitRoom = {"text" : "You find hall and stairs, choose wisely", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
-                var exitRoom = {"text" : "You exit the room and enter a new one", "choices": ["exit room"], "outcomes": [exitRoom]};
+                "choices": ["exit room"], "outcomes": [exitRoom1]};
+                // Either keep searching (lose sanity) or exit room1
                 var searchRoom = {"text" : "You search the room and find nothing, but you start to feel like you are going insane", 
                 "gameEvent": function() {
                     playerObj.sanity -= 5;
                     updatePlayerStatus("setS", playerObj.sanity);
                 },
-                "choices": ["Search again", "exit room"], "outcomes": [searchAgain, exitRoom]};
-                // [addMushroomToInventory, addArmorToInventory, addWeaponToInventory, screamHelp] };
+                "choices": ["Search again", "exit room"], "outcomes": [searchAgain, exitRoom1]};
+                // START EVENT
                 var gameEvent1 = {"text" : "You wake up in a cold dungeon, but you have no idea how you got there.", "choices": ["Search Room", "Scream for help"], "outcomes": [searchRoom, screamHelp]};
                 GAME_EVENTS.push(gameEvent1);
-                // return gameEvents;
             }
 
 
@@ -423,16 +454,10 @@
 
             /*
             
-            6. The game must have a main game declared function, and three other declared functions. At least two methods of an object must also be utilized. This can be the main game object or other created objects. Use functions and methods to minimize on repeating of code. 
-            
-            7.More points for cleaner, less repeated code.
-            
             10. The game will need to make use of a timer of some sorts that uses setInterval. This could be a game timer, or a timed scenario, or a battle timer, or any mixture of these. It can count up or countdown. This timer must be displayed to the user in an appropriate way. (no need to show hours if it countdowns in second)
             
-            13. The game will need to have at least 40 different "scenes" with at least 15 of those having choices/actions to be made. The scenes must convey using text what is happening. Images can also be used. 
-            Each action a player can make is both represented visually on the screen (button, something clickable) or with the use of the keyboard.
-            
             14. Implement some kind of "cheat code" in the game. It can skip to the end of the game, give alot of resources (money/health), reset a timer ect... The code must be entered on the keyboard using a specific combination of key presses that are not accidentaly going to get pressed (6+ keys in the sequence). The keys must be pressed within 1 second of each other and must be consecutive. If too much time elapses or an incorrect key is pressed in the middle of the sequence, the whole sequence should reset.
+
             15. The game will need some sort of start and ending screen.
             16. The code should be heavily commented describing what the code is doing or supposed to do.
             17. Be sure to test and debug the game before submitting. Obvious bugs, non-functioning code and fatal errors will be reflected in the grade.
