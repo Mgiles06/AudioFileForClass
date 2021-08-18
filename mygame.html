@@ -30,14 +30,14 @@
 	<body>
         <div id="startScreen">
             <button type="button" id="startBtn">Start Game!</button>
-            <img src="dungeon.jpeg">
+            <img src="https://mgiles06.github.io/AudioFileForClass/dungeon.jpeg">
         </div>
 	    <div class="row" id="gameContents">
             <div class="storyColumn">
                 <h1>Mark's Final Project The Dungeon</h1>
                 <p>Time: <span id='timer'>00:00</span></p>
                 <p>Your Objective: Make it out of the Dungeon alive</p>
-                <p>Game Controls: Press (1-5) to select an option. Press 'i' to view your inventory.</p>
+                <p>Game Controls: Press (1-5) to select an option. Press 'i' to view your inventory. Press 'e' to eat a mushroom. Press 'v' to show/hide the cheat code entry and result section.</p>
                 <p><span id='storyContainer'></span></p>
                 <table style="width:100%">
                     <tr>
@@ -48,17 +48,20 @@
                         <td id = "Choice5" style="display: block">Test</td>
                     </tr>
                 </table>
-                <img id="winner" src="winner.png">
-                <img id="loser" src="death.png">
+                <p id="user_input"></p>
+                <p id="cheat_message">Nothing</p>
+                <img id="winner" src="https://mgiles06.github.io/AudioFileForClass/winner.png">
+                <img id="loser" src="https://mgiles06.github.io/AudioFileForClass/death.png">
             </div>
             <div class="statsColumn">
                 <div class="canvasContainer">
-                <p><strong>Player Status</strong></p>
-                <p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
-                <p>Armour Condition: <span id=armourDurability></span></p>
-                <p>Weapon Condition: <span id=weaponDurability></span></p>
-                <canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+                    <p><strong>Player Status</strong></p>
+                    <p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
+                    <p>Armour Condition: <span id=armourDurability></span></p>
+                    <p>Weapon Condition: <span id=weaponDurability></span></p>
+                    <canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
                 </div>
+                <p id="revealCheatCodes"></p>
             </div>
 	    </div>
 		<script>
@@ -69,6 +72,12 @@
             const ARMOUR_INDEX = 1;
             const WEAPON_INDEX = 2;
             const MAX_CHOICES = 5;
+            const userInputDisplay = document.getElementById("user_input");
+            const cheatMessage = document.getElementById("cheat_message");
+            userInputDisplay.style.display = "none";
+            cheatMessage.style.display = "none";
+            const CHEAT_CODES_TEXT = "CHEAT CODES UNLOCKED! \n'shrooms' -> Adds 100 mushrooms\n'hlppls' -> Show cheats\n'outofhr -> Automatic Win";
+
             var currentEvent;
             var width, height = 300;
             var statusId;
@@ -282,10 +291,99 @@
                         stringToAlert += playerObj.inventory[WEAPON_INDEX].name; 
                         alert(stringToAlert);
                         break;
+                    case "v":
+                        if (userInputDisplay.style.display === "none" && cheatMessage.style.display === "none") {
+                            userInputDisplay.style.display = "block";
+                            cheatMessage.style.display = "block";
+                        } else {
+                            userInputDisplay.style.display = "none";
+                            cheatMessage.style.display = "none";
+                        }
+                        break;
                 }
             }
 
             window.addEventListener("keypress", keyListener);
+
+            var winGame = {"text": "You made it out",
+            "gameEvent": function() {
+                winnerPic.style.display = "block";
+                clearInterval(timerId);
+            }, "choices" : []};
+
+            // Found how to add cheat codes by viewing this post: https://javascript.plainenglish.io/how-to-detect-a-sequence-of-keystrokes-in-javascript-83ec6ffd8e93
+            // CHEAT CODE IMPLEMENTATION START
+            // keydown listener on the page for tracking sequence of keys pressed
+            document.addEventListener('DOMContentLoaded', () => {
+                'use strict';
+
+                const options = {
+                    eventType: 'keydown',
+                    keystrokeDelay: 1000
+                };
+
+                keyMapper([updateUI], options);
+            });
+
+            // responsible for mapping the keys pressed and determining the delay between keystrokes
+            function keyMapper(callbackList, options) {
+                const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
+                const keystrokeDelay = delay || 1000;
+                const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
+
+                let state = {
+                    buffer: [],
+                    lastKeyTime: Date.now()
+                };
+
+                document.addEventListener(eventType, event => {
+                    const key = event.key;
+                    const currentTime = Date.now();
+                    let buffer = [];
+
+                    if (currentTime - state.lastKeyTime > keystrokeDelay) {
+                        buffer = [key];
+                    } else {
+                        buffer = [...state.buffer, key];
+                    }
+
+                    state = {buffer: buffer, lastKeyTime: currentTime};
+
+                    callbackList.forEach(callback => callback(buffer));
+                });
+
+                function hasProperty(property, object) {
+                    return object && object.hasOwnProperty(property);
+                }
+            }
+
+            // Updates the userInput of current keySequence they have entered as well as the cheatMessage
+            function updateUI(keySequence) {
+                const userInput = keySequence.join('').toLowerCase();
+                const keySequences = {
+                    'shrooms': 'Adds 100 mushrooms',
+                    'hlppls': "Show cheats",
+                    'outofhr': "Automatic Win"
+                };
+                userInputDisplay.innerText = userInput;
+                cheatMessage.innerText = keySequences[userInput] || 'Nothing';
+
+                if (keySequences[userInput]) {
+                    switch(keySequences[userInput]){
+                        case 'Adds 100 mushrooms':
+                            playerObj.inventory[MUSHROOM_INDEX].quantity += 100;
+                            alert("You got 100 mushrooms");
+                            break;
+                        case 'Show cheats':
+                            document.getElementById("revealCheatCodes").innerText = CHEAT_CODES_TEXT;
+                            break;
+                        case 'Automatic Win':
+                            updateChoices(winGame);
+                            break;
+                    }
+                }
+            }
+            // CHEAT CODE IMPLEMENTATION END
 
             function setupPlayer() {
                 var mushroomsObj = {"quantity": 0, "eatMushroom" : function(){ eatMushroom(this)}};
@@ -301,7 +399,7 @@
 
             function eatMushroom(mushroom) {
                 if (mushroom.quantity>0){
-                    playerObj.health +=randomNumber(-5,25);
+                    playerObj.health += randomNumber(-5,25);
                     updatePlayerStatus("setH", playerObj.health);
                     mushroom.quantity--;
                     console.log(playerObj);
@@ -332,11 +430,6 @@
             }
 
             function createGameEvents(){
-                var winGame = {"text": "You made it out",
-                "gameEvent": function() {
-                    winnerPic.style.display = "block";
-                    clearInterval(timerId);
-                }, "choices" : []};
                 var loseGame = {"text": "You died",
                 "gameEvent": function() {
                     loserPic.style.display = "block";
@@ -403,16 +496,16 @@
                 var run = {"text" : "You manage to run away from the goblin", "choices": ["Exit room"], "outcomes": [exitRoom1]};
                 var kill = {"text" : "Using your torch you avoid the obstacles in the dungeon and finally kill the goblin",
                 "gameEvent": function() {
-                    playerObj.sanity = 10;
+                    playerObj.sanity += 10;
                     updatePlayerStatus("setS", playerObj.sanity);
                 }, "choices": ["Continue walking through the dungeon"], "outcomes": [find]};
                 var chase = {"text" : "You chase the goblin through the darkness", "choices": ["Sprint after him!", "Grab a torch to light your way"], "outcomes": [sprintAfter, kill]};
-                var useSword = {"text" : "You hurt the goblin and he runs away", 
+                var useSword = {"text" : "You hurt the goblin, damaging your sword in the process, and the goblin runs away", 
                 "gameEvent": function() {
                     playerObj.inventory[WEAPON_INDEX].durability -= 2;
                     updatePlayerStatus("setWeapon", playerObj.inventory[WEAPON_INDEX].durability);
                 }, "choices": ["chase"], "outcomes": [chase]};
-                var screamHelp = {"text" : "A goblin comes from around the corner and hits you", 
+                var screamHelp = {"text" : "A goblin comes from around the corner and hits you, damaging your armour", 
                 "gameEvent": function() {
                     if (playerObj.inventory[ARMOUR_INDEX].durability > 0){
                         playerObj.inventory[ARMOUR_INDEX].durability -= 10;
@@ -443,6 +536,10 @@
 
 
             function updateChoices(event){
+                // Added for automatic win
+                if (event.text == "You made it out"){
+                    event.gameEvent();
+                }
                 if (event.text) {
                     var storyText = document.getElementById("storyContainer");
                     storyText.innerText = event.text;
