@@ -60,7 +60,7 @@
 		</div>
 	    </div>
 		<script>
-            var playerObj, weakarmorObj, weakswordObj;//, loafObj, potatoObj;
+            var playerObj, weakarmorObj, weakswordObj;
 
             const GAME_EVENTS = new Array();
             const MUSHROOM_INDEX = 0;
@@ -69,6 +69,7 @@
             const MAX_CHOICES = 5;
             var currentEvent;
             var width, height = 300;
+            var statusId;
 
             var playerCanvas = document.getElementById("canvas");
             playerCanvas.style.backgroundColor = "white";
@@ -93,7 +94,7 @@
             }
 
             function updatePlayerStatus(status, amount){
-                context.clearRect(0, 0, width, height);
+                context.clearRect(0, 0, playerCanvas.width, playerCanvas.height);
                 // Draw the eyes
                 context.beginPath();
                 context.arc(120, 100, 20, 0, 2 * Math.PI);
@@ -171,8 +172,14 @@
                     case "setH":
                         healthStatus.innerText = amount;
                         break;
-                    case "setG":
-                        goldStatus.innerText = amount;
+                    case "setS":
+                        sanityStatus.innerText = amount;
+                        break;
+                    case "setArmour":
+                        armourStatus.innerText = amount;
+                        break;
+                    case "setWeapon":
+                        weaponStatus.innerText = amount;
                         break;
                 }
             }
@@ -181,52 +188,47 @@
                 switch(event.key){
                     case "1":
                         if(currentEvent.choices[0]){
-                            if (typeof(currentEvent.outcomes[0].add) != 'function'){
-                                currentEvent = currentEvent.outcomes[0];
-                                updateChoices(currentEvent);
-                            } else {
-                                currentEvent.outcomes[0].add();
+                            if (currentEvent.outcomes[0].gameEvent){
+                                currentEvent.outcomes[0].gameEvent();
                             }
+                            currentEvent = currentEvent.outcomes[0];
+                            updateChoices(currentEvent);
                         }
                         break;
                     case "2":
                         if(currentEvent.choices[1]){
-                            if (typeof(currentEvent.outcomes[1].add) != 'function'){
-                                currentEvent = currentEvent.outcomes[1];
-                                updateChoices(currentEvent);
-                            } else {
-                                currentEvent.outcomes[1].add();
+                            if (currentEvent.outcomes[1].gameEvent){
+                                currentEvent.outcomes[1].gameEvent();
                             }
+                            currentEvent = currentEvent.outcomes[1];
+                            updateChoices(currentEvent);
                         }
                         break;
                     case "3":
                         if(currentEvent.choices[2]){
-                            if (typeof(currentEvent.outcomes[2].add) != 'function'){
-                                currentEvent = currentEvent.outcomes[2];
-                                updateChoices(currentEvent);
-                            } else {
-                                currentEvent.outcomes[2].add();
+                            if (currentEvent.outcomes[2].gameEvent){
+                                currentEvent.outcomes[2].gameEvent();
                             }
+                            currentEvent = currentEvent.outcomes[2];
+                            updateChoices(currentEvent);
                         }
                         break;
                     case "4":
                         if(currentEvent.choices[3]){
-                            if (typeof(currentEvent.outcomes[3].add) != 'function'){
-                                currentEvent = currentEvent.outcomes[3];
-                                updateChoices(currentEvent);
-                            } else {
-                                currentEvent.outcomes[3].add();
+                            if (currentEvent.outcomes[3].gameEvent){
+                                currentEvent.outcomes[3].gameEvent();
                             }
+                            currentEvent = currentEvent.outcomes[3];
+                            updateChoices(currentEvent);
                         }
                         break;
                     case "5":
                         if(currentEvent.choices[4]){
-                            if (typeof(currentEvent.outcomes[0].add) != 'function'){
-                                currentEvent = currentEvent.outcomes[4];
-                                updateChoices(currentEvent);
-                            } else {
-                                currentEvent.outcomes[4].add();
+                            if (currentEvent.outcomes[4].gameEvent){
+                                currentEvent.outcomes[4].gameEvent();
                             }
+                            currentEvent = currentEvent.outcomes[4];
+                            updateChoices(currentEvent);
                         }
                         break;
                     case "e":
@@ -250,19 +252,11 @@
                 weakarmourObj = {"name" : "light armour", "durability" : 25};
                 weakswordObj = {"name" : "wooden sword", "durability" : 10};
                 playerObj = { "health" : 150, "sanity": 50, "inventory" : [mushroomsObj, weakarmourObj, weakswordObj]};
-                healthStatus.innerText = playerObj.health;
-                sanityStatus.innerText = playerObj.sanity;
-                armourStatus.innerText = playerObj.inventory[ARMOUR_INDEX].durability;
-                weaponStatus.innerText = playerObj.inventory[WEAPON_INDEX].durability;
+                updatePlayerStatus("setH", playerObj.health);
+                updatePlayerStatus("setS", playerObj.sanity);
+                updatePlayerStatus("setArmour", playerObj.inventory[ARMOUR_INDEX].durability);
+                updatePlayerStatus("setWeapon", playerObj.inventory[WEAPON_INDEX].durability);
                 updatePlayerStatus("happy");
-                // loafObj = {"name" : "loaf of bread", "quantity" : 1};
-                // potatoObj = {"name" : "bag of potatoes", "quantity" : 1};
-                // playerInventory
-                // playerObj.groceries.push(weakarmorObj, weakswordObj, loafObj, potatoObj);
-                // playerObj
-                // playerObj.groceries.push(bananaObj)
-                // playerObj.groceries.push(loafObj)
-                // playerObj.groceries.push(potatoObj)
             }
 
             function eatMushroom(mushroom) {
@@ -275,37 +269,23 @@
                 else {
                     alert("You have no mushrooms");
                 }
-                // return Mushroom;
             }
 
             function addItemToInventory(item){
                 switch(item){
                     case "Mushroom":
-                        if(playerObj.gold >= 50){
-                            playerObj.inventory[MUSHROOM_INDEX].quantity++;
-                            playerObj.gold -= 50;
-                            console.log(playerObj);
-                        } else {
-                            alert("You cannot afford to buy another Mushroom");
-                        }
+                        playerObj.inventory[MUSHROOM_INDEX].quantity++;
+                        console.log(playerObj);
                         break;
-                    case "Armour":
-                        if(playerObj.gold >= 300){
-                            playerObj.inventory[ARMOUR_INDEX] = "has fake gold";
-                            playerObj.gold -= 300;
-                            console.log(playerObj);
-                        } else {
-                            alert("You cannot afford to buy fake gold");
-                        }
+                    case "setArmour":
+                        playerObj.inventory[ARMOUR_INDEX] = item;
+                        updatePlayerStatus("setArmour", item.durability);
+                        console.log(playerObj);
                         break;
                     case "Weapon":
-                        if(playerObj.gold >= 999999) {
-                            playerObj.inventory[WEAPON_INDEX] = "has secret key";
-                            playerObj.gold -= 999999;
-                            console.log(playerObj);
-                        } else {
-                            alert("You cannot afford to buy the secret key")
-                        }
+                        playerObj.inventory[WEAPON_INDEX] = item;
+                        updatePlayerStatus("setWeapon", item.durability);
+                        console.log(playerObj);
                         break;
                 }
                 return 0;
@@ -355,7 +335,12 @@
                 var roomTwo = {"text" : "You enter the cold room and find two doors", "choices": ["brown door", "green door"], "outcomes": [doorOne, doorTwo]};
                 var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
                 var exitRoom = {"text" : "While running you exit the room", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
-                var searchAgain = {"text" : "You find nothing again", "choices": ["exit room"], "outcomes": [exitRoom]};
+                var searchAgain = {"text" : "You find nothing again and are really starting to go insane!", 
+                "gameEvent": function() {
+                    playerObj.sanity -= 10;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                },
+                "choices": ["exit room"], "outcomes": [exitRoom]};
                 var roomOne = {"text" : "You walk into the room, and get scared to death", "choices": [], "outcomes": [loseGame]};
                 var door = {"text" : "You open the door, and make it out", "choices": [], "outcomes": [winGame]};
                 var stairs = {"text" : "You walk up the stairs, and find another door", "choices": ["yellow door"], "outcomes": [door]};
@@ -365,7 +350,12 @@
                 var hall = {"text" : "While running you exit the room", "choices": ["creepy room", "cold room"], "outcomes": [roomOne, roomTwo]};
                 var exitRoom = {"text" : "You find hall and stairs, choose wisely", "choices": ["hall", "stairs"], "outcomes": [hall, stairs]};
                 var exitRoom = {"text" : "You exit the room and enter a new one", "choices": ["exit room"], "outcomes": [exitRoom]};
-                var searchRoom = {"text" : "You search the room and find nothing", "choices": ["Search again", "exit room"], "outcomes": [searchAgain, exitRoom]};
+                var searchRoom = {"text" : "You search the room and find nothing, but you start to feel like you are going insane", 
+                "gameEvent": function() {
+                    playerObj.sanity -= 5;
+                    updatePlayerStatus("setS", playerObj.sanity);
+                },
+                "choices": ["Search again", "exit room"], "outcomes": [searchAgain, exitRoom]};
                 // [addMushroomToInventory, addArmorToInventory, addWeaponToInventory, screamHelp] };
                 var gameEvent1 = {"text" : "You wake up in a cold dungeon, but you have no idea how you got there.", "choices": ["Search Room", "Scream for help"], "outcomes": [searchRoom, screamHelp]};
                 GAME_EVENTS.push(gameEvent1);
@@ -393,6 +383,23 @@
                     console.log("No choices to update. Player probably bought something.")
                 }
             }
+
+            id = setInterval(checkIfPlayerStatusNeedsUpdate,250);
+
+            function checkIfPlayerStatusNeedsUpdate() {
+                if (playerObj.sanity < 40 || playerObj.health < 100) {
+                    updatePlayerStatus("alright");
+                } else {
+                    updatePlayerStatus("happy");
+                }
+                if (playerObj.sanity < 20 || playerObj.health < 50) {
+                    updatePlayerStatus("sad");
+                }
+                if (playerObj.sanity <= 0 || playerObj.health <= 0) {
+                    updatePlayerStatus("dead");
+                    //TODO: GAME OVER SCREEN
+                }
+            }
             
             function main() {
                 createGameEvents();
@@ -415,32 +422,17 @@
             main();
 
             /*
-            1. First come up with an original premise and characters. If there is some overlap concerning themes and names from other stories across the various media platforms that is fine, but please not blatant plagiarism of another's work.
-
-            2. As a base you can use the choose your adventure code in the unit 4 intro as a base for creating your game. However know that there will have to be heavy modifications to it to fulfill the other requirements.
             
-            3. The game must include instructions and a basic synopsis of the story. Be sure to explain each system that is present in the game so the play is aware or what they will have to do. This can be included in the HTML of the web page itself or inside the game engine.
-            
-            4. The game must make use of document.getElementById to manipulate the HTMLElement.
-            
-            5.The game will need to make use of at least one Object that stores vital information for the game. This could be character data such as name, level, experience, stats ect..., or store different states of the game or flags. Feel free to use as many objects as need though.
             6. The game must have a main game declared function, and three other declared functions. At least two methods of an object must also be utilized. This can be the main game object or other created objects. Use functions and methods to minimize on repeating of code. 
             
             7.More points for cleaner, less repeated code.
             
-            8.The game must make use of an Array to keep track of something. This could be an inventory system, a history system, an achievement system, ect.. The contents of this array should be able to be displayed back to the player either at the press of a button, constantly updated on screen, or as a results screen. Feel free to use as many arrays as needed.
-            
-            9. A for loop and/or while loop needs to be used. These can be used to iterate though an Array to display information back. They could also be use as part of the game loop or some sort of AI logic, or as part of a system.
-            
             10. The game will need to make use of a timer of some sorts that uses setInterval. This could be a game timer, or a timed scenario, or a battle timer, or any mixture of these. It can count up or countdown. This timer must be displayed to the user in an appropriate way. (no need to show hours if it countdowns in second)
             
-            11. The game must include at least one sort of non-time based counter that is displayed to the player. That could be money, health, score, magic, stress level, or any numerical system related to the game. There can be multiples of these but they must be represented to the player in some way(in number, in bars, in symbols, ect...). These values should be stored in their own variables or property of a larger game object.
+            13. The game will need to have at least 40 different "scenes" with at least 15 of those having choices/actions to be made. The scenes must convey using text what is happening. Images can also be used. 
+            Each action a player can make is both represented visually on the screen (button, something clickable) or with the use of the keyboard.
             
-            13. The game will need to have at least 40 different "scenes" with at least 15 of those having choices/actions to be made. The scenes must convey using text what is happening. Images can also be used. If you are using some sort of battle system in the game, then a single battle is one set of choices/actions in a single scene, not each time you choose an action in the battle. These choices/actions must branch off into different results and have some effect on the game. (both choices always lead to the exact same following result) There can be more than two choices per scene and after the results have had their effect, the game can come back to single path or the can infinitely branch out with many possible endings.
-            Each action a player can make is both represented visually on the screen (button, something clickable) or with the use of the keyboard. The corresponding key to press can be displayed as a hover effect over the button, or described outside the game in the HTML, or inside the game in an instructions screen, or on the button itself.
-            
-            14. The game must make use of random numbers in a meaningful way. This can be randomly selected choice, a random event or chance at an event happening, random damage in a battle, or random item pickups.
-            Implement some kind of "cheat code" in the game. It can skip to the end of the game, give alot of resources (money/health), reset a timer ect... The code must be entered on the keyboard using a specific combination of key presses that are not accidentaly going to get pressed (6+ keys in the sequence). The keys must be pressed within 1 second of each other and must be consecutive. If too much time elapses or an incorrect key is pressed in the middle of the sequence, the whole sequence should reset.
+            14. Implement some kind of "cheat code" in the game. It can skip to the end of the game, give alot of resources (money/health), reset a timer ect... The code must be entered on the keyboard using a specific combination of key presses that are not accidentaly going to get pressed (6+ keys in the sequence). The keys must be pressed within 1 second of each other and must be consecutive. If too much time elapses or an incorrect key is pressed in the middle of the sequence, the whole sequence should reset.
             15. The game will need some sort of start and ending screen.
             16. The code should be heavily commented describing what the code is doing or supposed to do.
             17. Be sure to test and debug the game before submitting. Obvious bugs, non-functioning code and fatal errors will be reflected in the grade.
