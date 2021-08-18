@@ -35,7 +35,7 @@
 	    <div class="row" id="gameContents">
             <div class="storyColumn">
                 <h1>Mark's Final Project The Dungeon</h1>
-                <p>Time: <span id='timer'>00:00:00</span></p>
+                <p>Time: <span id='timer'>00:00</span></p>
                 <p>Your Objective: Make it out of the Dungeon alive</p>
                 <p>Game Controls: Press (1-5) to select an option. Press 'i' to view your inventory.</p>
                 <p><span id='storyContainer'></span></p>
@@ -48,16 +48,18 @@
                         <td id = "Choice5" style="display: block">Test</td>
                     </tr>
                 </table>
+                <img id="winner" src="winner.png">
+                <img id="loser" src="death.png">
             </div>
-		<div class="statsColumn">
-		    <div class="canvasContainer">
-			<p><strong>Player Status</strong></p>
-			<p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
-			<p>Armour Condition: <span id=armourDurability></span></p>
-			<p>Weapon Condition: <span id=weaponDurability></span></p>
-			<canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
-		    </div>
-		</div>
+            <div class="statsColumn">
+                <div class="canvasContainer">
+                <p><strong>Player Status</strong></p>
+                <p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
+                <p>Armour Condition: <span id=armourDurability></span></p>
+                <p>Weapon Condition: <span id=weaponDurability></span></p>
+                <canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+                </div>
+            </div>
 	    </div>
 		<script>
             var playerObj, weakarmorObj, weakswordObj;
@@ -70,6 +72,7 @@
             var currentEvent;
             var width, height = 300;
             var statusId;
+            var timerId;
 
             var playerCanvas = document.getElementById("canvas");
             playerCanvas.style.backgroundColor = "white";
@@ -77,6 +80,10 @@
 
             var gameContents = document.getElementById("gameContents");
             gameContents.style.display = "none";
+            var winnerPic = document.getElementById("winner");
+            winnerPic.style.display = "none";
+            var loserPic = document.getElementById("loser");
+            loserPic.style.display = "none";
             var startScreen = document.getElementById("startScreen");
 
             document.getElementById("startBtn").addEventListener("click", function() {
@@ -92,6 +99,40 @@
             function randomNumber(min, max){                               
                 return Math.floor(Math.random() * (max - min + 1)) + min;  
             }
+
+            function updateTimer(){
+				var counter
+                counter++;
+                var SECONDS = 60;
+                var MINUTES = 60;
+                count = 0;
+                count++;
+				var hours, minutes, seconds;
+				displayString = "";
+                hours = Math.floor(count/(SECONDS*MINUTES));
+                minutes = Math.floor(count/(SECONDS)) - hours * MINUTES;
+				seconds = count - (hours*MINUTES*SECONDS) - (minutes*SECONDS);
+				if(hours==0){
+                    displayString+="00:";
+                } else if(hours<10){
+                    displayString+="0"+hours+":";
+                } else {
+                    displayString+=hours+":";
+                }
+                if(minutes==0){
+                    displayString+="00:";
+                } else if(minutes<10){
+                    displayString+="0"+minutes+":";
+                } else {
+                    displayString+=minutes+":";
+                }
+                if(seconds<10){
+                    displayString+="0"+seconds;
+                } else {
+                    displayString+=seconds;
+                }
+				timer.innerText=displayString;
+			}
 
             function updatePlayerStatus(status, amount){
                 context.clearRect(0, 0, playerCanvas.width, playerCanvas.height);
@@ -292,8 +333,16 @@
             }
 
             function createGameEvents(){
-                var winGame = {"text": "You made it out", "choices" : []};
-                var loseGame = {"text": "You died", "choices" : []};
+                var winGame = {"text": "You made it out",
+                "gameEvent": function() {
+                    winnerPic.style.display = "block";
+                    clearInterval(timerId);
+                }, "choices" : []};
+                var loseGame = {"text": "You died",
+                "gameEvent": function() {
+                    loserPic.style.display = "block";
+                    clearInterval(timerId);
+                }, "choices" : []};
                 var addMushroomToInventory = {"add": function() {addItemToInventory("Mushroom")}};
                 var addArmourToInventory = {"add": function() {addItemToInventory("Armour")}};
                 var addWeaponToInventory = {"add": function() {addItemToInventory("Weapon")}};
@@ -428,7 +477,6 @@
                 }
                 if (playerObj.sanity <= 0 || playerObj.health <= 0) {
                     updatePlayerStatus("dead");
-                    //TODO: GAME OVER SCREEN
                 }
             }
             
@@ -437,6 +485,7 @@
                 var startEvent = GAME_EVENTS[0];
                 updateChoices(startEvent);
                 currentEvent = startEvent;
+                timerId = setInterval(updateTimer,1000);
                 // Game will run while player has health and has not reached home
                 // while(playerObj.health > 0 && !currentEvent.text.includes("You made it home")){
                 //     // var startEvent = GAME_EVENTS[0];
