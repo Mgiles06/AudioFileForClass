@@ -132,6 +132,85 @@
             }
 
             window.addEventListener("keypress", keyListener);
+			
+	    function updatePlayerStatus(status){
+                context.clearRect(0, 0, width, height);
+                // Draw the eyes
+                context.beginPath();
+                context.arc(120, 100, 20, 0, 2 * Math.PI);
+                context.stroke()
+                context.beginPath();
+                context.arc(180, 100, 20, 0, 2 * Math.PI);
+                context.stroke()
+                switch(status){
+                    case "happy":
+                        context.beginPath();
+                        context.arc(150, 160, 90, 0, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        break
+                    case "alright":
+                        context.beginPath();
+                        context.moveTo(80, 200);
+                        context.lineTo(220, 200)
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        break
+                    case "sad":
+                        context.beginPath();
+                        context.arc(150, 250, 80, 0 * Math.PI, 1 * Math.PI, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(120, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.arc(180, 100, 5, 0, 2 * Math.PI);
+                        context.fill();
+                        context.beginPath();
+                        context.moveTo(180, 120);
+                        context.lineTo(190, 140)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(180, 120);
+                        context.lineTo(170, 140)
+                        context.stroke()
+                        context.beginPath();
+                        context.arc(180, 140, 10, 0, 1 * Math.PI);
+                        context.stroke()
+                        break
+                    case "dead":
+                        context.beginPath();
+                        context.arc(150, 250, 80, 0 * Math.PI, 1 * Math.PI, 1 * Math.PI);
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(160, 120);
+                        context.lineTo(200, 80)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(160, 80);
+                        context.lineTo(200, 120)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(100, 120);
+                        context.lineTo(140, 80)
+                        context.stroke()
+                        context.beginPath();
+                        context.moveTo(100, 80);
+                        context.lineTo(140, 120)
+                        context.stroke()
+                        break
+                }
+            }
 
             function setupPlayer() {
                 var mushroomsObj = {"quantity": 0, "drinkMushroom" : function(){ eatMushroom(this)}};
@@ -142,6 +221,7 @@
                 sanityStatus.innerText = playerObj.sanity;
                 armourStatus.innerText = playerObj.inventory[ARMOUR_INDEX].durability;
                 weaponStatus.innerText = playerObj.inventory[WEAPON_INDEX].durability;
+		updatePlayerStatus("happy");
                 // loafObj = {"name" : "loaf of bread", "quantity" : 1};
                 // potatoObj = {"name" : "bag of potatoes", "quantity" : 1};
                 // playerInventory
