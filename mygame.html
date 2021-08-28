@@ -28,39 +28,46 @@
         </style>
 	</head>
 	<body>
-		<h1>Mark's Final Project Game Name</h1>
-        <div class="row">
+	<div class="row">
             <div class="storyColumn">
-            <p>Time: <span id='timer'>00:00:00</span></p>
-            <p>Your Objective: Make it out of the Dungeon alive</p>
-            <p><span id='storyContainer'></span></p>
-            <table style="width:100%">
-                <tr>
-                    <td id = "Choice1" style="display: block">Test</td>
-                    <td id = "Choice2" style="display: block">Test</td>
-                    <td id = "Choice3" style="display: block">Test</td>
-                    <td id = "Choice4" style="display: block">Test</td>
-                    <td id = "Choice5" style="display: block">Test</td>
-                </tr>
-            </table>
-        </div>
-        <div class="statsColumn">
-            <div class="canvasContainer">
-                <p><strong>Player Status</strong></p>
-                <canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+                <h1>Mark's Final Project Game Name</h1>
+                <p>Time: <span id='timer'>00:00:00</span></p>
+                <p>Your Objective: Make it out of the Dungeon alive</p>
+                <p><span id='storyContainer'></span></p>
+                <table style="width:100%">
+                    <tr>
+                        <td id = "Choice1" style="display: block">Test</td>
+                        <td id = "Choice2" style="display: block">Test</td>
+                        <td id = "Choice3" style="display: block">Test</td>
+                        <td id = "Choice4" style="display: block">Test</td>
+                        <td id = "Choice5" style="display: block">Test</td>
+                    </tr>
+                </table>
             </div>
-        </div>
-    </div>
+		<div class="statsColumn">
+		    <div class="canvasContainer">
+			<p><strong>Player Status</strong></p>
+			<p>Health: <span id=playerHealth></span> &emsp; Sanity: <span id=playerSanity></span></p>
+			<p>Armour Condition: <span id=armourDurability></span></p>
+			<p>Weapon Condition: <span id=weaponDurability></span></p>
+			<canvas id="canvas" style="border:thin solid;" width="300" height="300"></canvas>
+		    </div>
+		</div>
+	    </div>
 		<script>
             var playerObj, weakarmorObj, weakswordObj;//, loafObj, potatoObj;
 
             const GAME_EVENTS = new Array();
             const MUSHROOM_INDEX = 0;
-            const ARMOR_INDEX = 1;
+            const ARMOUR_INDEX = 1;
             const WEAPON_INDEX = 2;
             const MAX_CHOICES = 5;
             var currentEvent;
 
+	    var healthStatus = document.getElementById("playerHealth");
+            var sanityStatus = document.getElementById("playerSanity");
+            var armourStatus = document.getElementById("armourDurability");
+            var weaponStatus = document.getElementById("weaponDurability");
 
             function randomNumber(min, max){                               
                 return Math.floor(Math.random() * (max - min + 1)) + min;  
@@ -128,9 +135,13 @@
 
             function setupPlayer() {
                 var mushroomsObj = {"quantity": 0, "drinkMushroom" : function(){ eatMushroom(this)}};
-                weakarmorObj = {"name" : "light armor", "durability" : 25};
+                weakarmourObj = {"name" : "light armour", "durability" : 25};
                 weakswordObj = {"name" : "wooden sword", "durability" : 10};
-                playerObj = { "health" : 150, "sanity": 50, "inventory" : [mushroomsObj, weakarmorObj, weakswordObj]};
+                playerObj = { "health" : 150, "sanity": 50, "inventory" : [mushroomsObj, weakarmourObj, weakswordObj]};
+		healthStatus.innerText = playerObj.health;
+                sanityStatus.innerText = playerObj.sanity;
+                armourStatus.innerText = playerObj.inventory[ARMOUR_INDEX].durability;
+                weaponStatus.innerText = playerObj.inventory[WEAPON_INDEX].durability;
                 // loafObj = {"name" : "loaf of bread", "quantity" : 1};
                 // potatoObj = {"name" : "bag of potatoes", "quantity" : 1};
                 // playerInventory
@@ -164,9 +175,9 @@
                             alert("You cannot afford to buy another Mushroom");
                         }
                         break;
-                    case "Armor":
+                    case "Armour":
                         if(playerObj.gold >= 300){
-                            playerObj.inventory[ARMOR_INDEX] = "has fake gold";
+                            playerObj.inventory[ARMOUR_INDEX] = "has fake gold";
                             playerObj.gold -= 300;
                             console.log(playerObj);
                         } else {
@@ -190,7 +201,7 @@
                 var winGame = {"text": "You made it out", "choices" : []};
                 var loseGame = {"text": "You died", "choices" : []};
                 var addMushroomToInventory = {"add": function() {addItemToInventory("Mushroom")}};
-                var addArmorToInventory = {"add": function() {addItemToInventory("Armor")}};
+                var addArmourToInventory = {"add": function() {addItemToInventory("Armour")}};
                 var addWeaponToInventory = {"add": function() {addItemToInventory("Weapon")}};
                 // TODO: Add obj vars with text, choices and outcomes. For outcomes that require a function we will need to make functions of them like I have above for adding the items to the inventory. Add events in reverse order as the event that happens before needs to know about the event happening after it, which must first be defined and created.
 
