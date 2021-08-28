@@ -64,10 +64,16 @@
             const MAX_CHOICES = 5;
             var currentEvent;
 
-	    var healthStatus = document.getElementById("playerHealth");
+	        var healthStatus = document.getElementById("playerHealth");
             var sanityStatus = document.getElementById("playerSanity");
             var armourStatus = document.getElementById("armourDurability");
             var weaponStatus = document.getElementById("weaponDurability");
+
+            var width, height = 300;
+
+            var playerCanvas = document.getElementById("canvas");
+            playerCanvas.style.backgroundColor = "white";
+            var context = canvas.getContext("2d");
 
             function randomNumber(min, max){                               
                 return Math.floor(Math.random() * (max - min + 1)) + min;  
